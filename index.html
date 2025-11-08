@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arbres Binaires - Cours NSI Terminale</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Styles personnalisés */
+        body {
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* Animation fade-in */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3B82F6, #10B981);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+        
+        /* Style pour les arbres visuels */
+        .node {
+            background: #3B82F6;
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .node:hover {
+            transform: scale(1.1);
+        }
+        
+        .tree-branch {
+            width: 2px;
+            background: #E5E7EB;
+            margin: 0 auto;
+        }
+        
+        /* Feedback pour exercices */
+        .correct {
+            background-color: #D1FAE5;
+            border-color: #10B981;
+        }
+        
+        .incorrect {
+            background-color: #FEE2E2;
+            border-color: #EF4444;
+        }
+        
+        /* Quiz styles */
+        .quiz-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .quiz-option:hover {
+            background-color: #EBF8FF;
+            transform: translateX(5px);
+        }
+        
+        .quiz-option.selected {
+            background-color: #3B82F6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    
+    <!-- Progress Bar -->
+    <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-4 right-4 z-50 bg-white rounded-lg shadow-md p-4">
+        <div class="flex space-x-2">
+            <button onclick="navigateSection('prev')" class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">◀ Précédent</button>
+            <button onclick="navigateSection('next')" class="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">Suivant ▶</button>
+        </div>
+    </nav>
+    
+    <!-- Menu des sections -->
+    <div class="fixed left-4 top-20 bg-white rounded-lg shadow-md p-4 hidden lg:block">
+        <h3 class="font-semibold mb-2">📚 Sections</h3>
+        <ul class="space-y-1 text-sm">
+            <li><a href="#section0" class="nav-link text-blue-600 hover:text-blue-800">🎯 Introduction</a></li>
+            <li><a href="#section1" class="nav-link text-blue-600 hover:text-blue-800">🌳 Définitions</a></li>
+            <li><a href="#section2" class="nav-link text-blue-600 hover:text-blue-800">📏 Hauteur & Taille</a></li>
+            <li><a href="#section3" class="nav-link text-blue-600 hover:text-blue-800">🔄 Parcours</a></li>
+            <li><a href="#section4" class="nav-link text-blue-600 hover:text-blue-800">🔍 ABR</a></li>
+            <li><a href="#section5" class="nav-link text-blue-600 hover:text-blue-800">✏️ Exercices</a></li>
+            <li><a href="#section6" class="nav-link text-blue-600 hover:text-blue-800">🎓 Quiz Final</a></li>
+        </ul>
+    </div>
+    
+    <!-- Contenu principal -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        
+        <!-- Section 0 : Introduction -->
+        <section id="section0" class="section min-h-screen flex items-center justify-center">
+            <div class="text-center fade-in">
+                <h1 class="text-5xl font-bold mb-6 text-blue-600">🌲 Arbres Binaires & ABR</h1>
+                <p class="text-xl mb-8 text-gray-600">Maîtrisez une structure fondamentale de l'informatique</p>
+                <div class="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto">
+                    <h2 class="text-2xl font-semibold mb-4">🎯 Objectifs du cours</h2>
+                    <ul class="text-left space-y-2">
+                        <li>✅ Comprendre la structure des arbres binaires</li>
+                        <li>✅ Calculer hauteur et taille efficacement</li>
+                        <li>✅ Maîtriser les différents parcours (infixe, préfixe, suffixe, largeur)</li>
+                        <li>✅ Découvrir les arbres binaires de recherche (ABR)</li>
+                        <li>✅ Implémenter les algorithmes en Python</li>
+                    </ul>
+                </div>
+                <button onclick="navigateSection('next')" class="mt-8 px-6 py-3 bg-gradient-to-r from-blue-500 to-green-500 text-white rounded-full font-semibold hover:scale-105 transition">
+                    Commencer l'aventure 🚀
+                </button>
+            </div>
+        </section>
+        
+        <!-- Section 1 : Définitions -->
+        <section id="section1" class="section hidden py-16">
+            <h2 class="text-4xl font-bold mb-8 text-center fade-in">🌳 Définitions et Vocabulaire</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Définition -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4">📖 Définition</h3>
+                    <p class="mb-4">Un <strong>arbre binaire</strong> est composé de <strong>nœuds</strong>. Chaque nœud contient :</p>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Une <strong>valeur</strong></li>
+                        <li>Un lien vers un <strong>sous-arbre gauche</strong></li>
+                        <li>Un lien vers un <strong>sous-arbre droit</strong></li>
+                    </ul>
+                </div>
+                
+                <!-- Vocabulaire interactif -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4">🎯 Testez vos connaissances</h3>
+                    <div class="space-y-4">
+                        <button onclick="showDefinition('racine')" class="w-full p-3 bg-blue-100 hover:bg-blue-200 rounded transition">
+                            🌱 Qu'est-ce que la racine ?
+                        </button>
+                        <button onclick="showDefinition('feuille')" class="w-full p-3 bg-green-100 hover:bg-green-200 rounded transition">
+                            🍃 Qu'est-ce qu'une feuille ?
+                        </button>
+                        <button onclick="showDefinition('nil')" class="w-full p-3 bg-purple-100 hover:bg-purple-200 rounded transition">
+                            0️⃣ Que signifie nil ?
+                        </button>
+                    </div>
+                    <div id="definitionBox" class="mt-4 p-4 bg-gray-100 rounded hidden"></div>
+                </div>
+            </div>
+            
+            <!-- Visualisation d'arbre -->
+            <div class="mt-12 bg-white rounded-lg shadow-lg p-6 fade-in">
+                <h3 class="text-2xl font-semibold mb-4">🎨 Représentation visuelle</h3>
+                <div id="treeVisualization" class="flex justify-center items-center overflow-auto">
+                    <!-- L'arbre sera généré en JS -->
+                </div>
+                <p class="text-center mt-4 text-gray-600">Cliquez sur les nœuds pour voir leurs informations !</p>
+            </div>
+            
+            <!-- Code Python -->
+            <div class="mt-8 bg-gray-900 text-gray-100 rounded-lg p-6 fade-in">
+                <h3 class="text-xl font-semibold mb-4 text-yellow-400">💻 Implémentation Python</h3>
+                <pre class="text-sm overflow-x-auto"><code>class Noeud:
+    """un nœud d'un arbre binaire"""
+    def __init__(self, g=None, v=None, d=None):
+        self.gauche = g  # sous-arbre gauche
+        self.valeur = v   # valeur du nœud
+        self.droit = d    # sous-arbre droit
+
+class Arbre:
+    """un arbre binaire"""
+    def __init__(self, noeud=None):
+        self.racine = noeud</code></pre>
+                <button onclick="animateCode()" class="mt-4 px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 transition">
+                    ▶️ Animer le code
+                </button>
+            </div>
+        </section>
+        
+        <!-- Section 2 : Hauteur et Taille -->
+        <section id="section2" class="section hidden py-16">
+            <h2 class="text-4xl font-bold mb-8 text-center fade-in">📏 Hauteur et Taille</h2>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Hauteur -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4 text-blue-600">📈 Hauteur</h3>
+                    <p class="mb-4">Nombre maximal de nœuds du niveau racine à une feuille.</p>
+                    <div class="bg-blue-50 p-4 rounded">
+                        <p class="font-mono">hauteur(a3) = 2</p>
+                        <p class="font-mono">hauteur(a10) = 4</p>
+                    </div>
+                </div>
+                
+                <!-- Taille -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4 text-green-600">📊 Taille</h3>
+                    <p class="mb-4">Nombre total de nœuds dans l'arbre.</p>
+                    <div class="bg-green-50 p-4 rounded">
+                        <p class="font-mono">taille(av) = 0</p>
+                        <p class="font-mono">taille(a10) = 10</p>
+                    </div>
+                </div>
+                
+                <!-- Relations -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4 text-purple-600">🔗 Relations</h3>
+                    <p class="text-sm">Pour tout arbre de taille N et hauteur h :</p>
+                    <div class="bg-purple-50 p-4 rounded mt-2">
+                        <p class="font-mono text-xs">log₂(N) ≤ h ≤ N</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Exercice interactif -->
+            <div class="mt-12 bg-white rounded-lg shadow-lg p-6 fade-in">
+                <h3 class="text-2xl font-semibold mb-4">🎯 Calculez vous-même !</h3>
+                <p class="mb-4">Complétez les fonctions Python pour calculer la hauteur et la taille :</p>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold mb-2">Fonction hauteur :</h4>
+                        <textarea id="hauteurCode" class="w-full h-32 p-3 bg-gray-900 text-green-400 rounded font-mono text-sm" placeholder="def hauteur(racine):
+    # À compléter...
+    pass">def hauteur(racine):
+    if racine is None:
+        return 0
+    return 1 + max(hauteur(racine.gauche), hauteur(racine.droit))</textarea>
+                        <button onclick="testHauteur()" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                            Tester la fonction
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-2">Fonction taille :</h4>
+                        <textarea id="tailleCode" class="w-full h-32 p-3 bg-gray-900 text-green-400 rounded font-mono text-sm" placeholder="def taille(racine):
+    # À compléter...
+    pass">def taille(racine):
+    if racine is None:
+        return 0
+    return 1 + taille(racine.gauche) + taille(racine.droit)</textarea>
+                        <button onclick="testTaille()" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
+                            Tester la fonction
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="exerciseFeedback" class="mt-4 p-4 rounded hidden"></div>
+            </div>
+        </section>
+        
+        <!-- Section 3 : Parcours -->
+        <section id="section3" class="section hidden py-16">
+            <h2 class="text-4xl font-bold mb-8 text-center fade-in">🔄 Parcours d'un Arbre Binaire</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Types de parcours -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4">📚 Types de parcours</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-blue-50 rounded">
+                            <h4 class="font-semibold text-blue-800">Infixe</h4>
+                            <p class="text-sm">Gauche → Racine → Droite</p>
+                        </div>
+                        <div class="p-4 bg-green-50 rounded">
+                            <h4 class="font-semibold text-green-800">Préfixe</h4>
+                            <p class="text-sm">Racine → Gauche → Droite</p>
+                        </div>
+                        <div class="p-4 bg-purple-50 rounded">
+                            <h4 class="font-semibold text-purple-800">Suffixe</h4>
+                            <p class="text-sm">Gauche → Droite → Racine</p>
+                        </div>
+                        <div class="p-4 bg-yellow-50 rounded">
+                            <h4 class="font-semibold text-yellow-800">En largeur</h4>
+                            <p class="text-sm">Niveau par niveau, gauche à droite</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Exercice de parcours -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4">🎯 Exercice pratique</h3>
+                    <p class="mb-4">Quel est le parcours infixe de cet arbre ?</p>
+                    <div id="parcoursTree" class="mb-4">
+                        <!-- Arbre exemple -->
+                    </div>
+                    <input type="text" id="parcoursInput" placeholder="Ex: D B E A F C" class="w-full p-3 border rounded mb-2">
+                    <button onclick="checkParcours()" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                        Vérifier
+                    </button>
+                    <div id="parcoursFeedback" class="mt-2 hidden"></div>
+                </div>
+            </div>
+            
+            <!-- Simulation de parcours -->
+            <div class="mt-12 bg-white rounded-lg shadow-lg p-6 fade-in">
+                <h3 class="text-2xl font-semibold mb-4">🎮 Simulateur de parcours</h3>
+                <p class="mb-4">Choisissez un type de parcours et visualisez-le étape par étape :</p>
+                <div class="flex space-x-2 mb-4 justify-center">
+                    <button onclick="simulerParcours('infixe')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">Infixe</button>
+                    <button onclick="simulerParcours('prefixe')" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">Préfixe</button>
+                    <button onclick="simulerParcours('suffixe')" class="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition">Suffixe</button>
+                </div>
+                <div id="simulationResult" class="p-4 bg-gray-100 rounded min-h-[100px] flex items-center justify-center text-lg font-mono">
+                    Cliquez sur un bouton pour démarrer la simulation
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 4 : ABR -->
+        <section id="section4" class="section hidden py-16">
+            <h2 class="text-4xl font-bold mb-8 text-center fade-in">🔍 Arbres Binaires de Recherche</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Propriétés ABR -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4">✨ Propriétés</h3>
+                    <ul class="space-y-2">
+                        <li>📌 Valeurs comparables (int, str)</li>
+                        <li>📌 Sous-arbre gauche : valeurs < nœud</li>
+                        <li>📌 Sous-arbre droit : valeurs > nœud</li>
+                        <li>📌 Parcours infixe → ordre trié</li>
+                    </ul>
+                </div>
+                
+                <!-- Opérations ABR -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-2xl font-semibold mb-4">🛠️ Opérations clés</h3>
+                    <div class="space-y-3">
+                        <button onclick="showABROperation('recherche')" class="w-full p-3 text-left bg-blue-100 hover:bg-blue-200 rounded transition">
+                            🔍 Recherche d'une valeur
+                        </button>
+                        <button onclick="showABROperation('ajout')" class="w-full p-3 text-left bg-green-100 hover:bg-green-200 rounded transition">
+                            ➕ Ajout d'une valeur
+                        </button>
+                        <button onclick="showABROperation('minimum')" class="w-full p-3 text-left bg-purple-100 hover:bg-purple-200 rounded transition">
+                            ⬇️ Trouver le minimum
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Complexité -->
+            <div class="mt-8 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg shadow-lg p-6 fade-in">
+                <h3 class="text-2xl font-semibold mb-4">⚡ Complexité</h3>
+                <p class="mb-4">La complexité dépend de la hauteur h :</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded">
+                        <h4 class="font-semibold text-red-600">Pire cas : O(N)</h4>
+                        <p class="text-sm">Arbre filiforme (peigne)</p>
+                    </div>
+                    <div class="bg-white p-4 rounded">
+                        <h4 class="font-semibold text-green-600">Meilleur cas : O(log N)</h4>
+                        <p class="text-sm">Arbre équilibré</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 5 : Exercices -->
+        <section id="section5" class="section hidden py-16">
+            <h2 class="text-4xl font-bold mb-8 text-center fade-in">✏️ Exercices Interactifs</h2>
+            
+            <div class="space-y-8">
+                <!-- Exercice 1 : QCM -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-xl font-semibold mb-4">❓ Question 1</h3>
+                    <p class="mb-4">Un arbre binaire de recherche vérifie :</p>
+                    <div class="space-y-2">
+                        <label class="flex items-center p-3 border rounded hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="qcm1" value="a" class="mr-3">
+                            <span>Toutes les valeurs du sous-arbre gauche sont > racine</span>
+                        </label>
+                        <label class="flex items-center p-3 border rounded hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="qcm1" value="b" class="mr-3">
+                            <span>Toutes les valeurs du sous-arbre gauche sont < racine</span>
+                        </label>
+                        <label class="flex items-center p-3 border rounded hover:bg-gray-50 cursor-pointer">
+                            <input type="radio" name="qcm1" value="c" class="mr-3">
+                            <span>Les feuilles sont toujours à gauche</span>
+                        </label>
+                    </div>
+                    <button onclick="checkQCM('qcm1', 'b')" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">
+                        Vérifier
+                    </button>
+                    <div id="qcm1-feedback" class="mt-2 hidden"></div>
+                </div>
+                
+                <!-- Exercice 2 : Code -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-xl font-semibold mb-4">💻 Question 2 - Complétez le code</h3>
+                    <p class="mb-4">Écrivez la fonction <code>appartient(racine, v)</code> pour un ABR :</p>
+                    <textarea id="codeAppartient" class="w-full h-40 p-3 bg-gray-900 text-green-400 rounded font-mono text-sm" placeholder="def appartient(racine, v):
+    # À compléter...
+    pass">def appartient(racine, v):
+    if racine is None:
+        return False
+    if v < racine.valeur:
+        return appartient(racine.gauche, v)
+    elif v == racine.valeur:
+        return True
+    else:
+        return appartient(racine.droit, v)</textarea>
+                    <button onclick="testAppartient()" class="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
+                        Tester
+                    </button>
+                    <div id="appartientFeedback" class="mt-2 hidden"></div>
+                </div>
+                
+                <!-- Exercice 3 : Vrai/Faux -->
+                <div class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                    <h3 class="text-xl font-semibold mb-4">✅/❌ Vrai ou Faux ?</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 border rounded">
+                            <span>Le parcours infixe d'un ABR donne toujours un ordre trié</span>
+                            <div>
+                                <button onclick="checkVF(this, true)" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition mr-2">Vrai</button>
+                                <button onclick="checkVF(this, false)" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">Faux</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 6 : Quiz Final -->
+        <section id="section6" class="section hidden py-16">
+            <h2 class="text-4xl font-bold mb-8 text-center fade-in">🎓 Quiz Final</h2>
+            
+            <div id="quizContainer" class="bg-white rounded-lg shadow-lg p-6 fade-in">
+                <!-- Les questions seront générées en JS -->
+            </div>
+            
+            <div id="quizResult" class="hidden mt-8 text-center">
+                <h3 class="text-3xl font-bold mb-4">🎉 Résultats</h3>
+                <div id="scoreDisplay" class="text-5xl font-bold mb-4"></div>
+                <p id="scoreMessage" class="text-xl mb-6"></p>
+                <button onclick="restartQuiz()" class="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
+                    Recommencer le quiz
+                </button>
+            </div>
+        </section>
+        
+        <!-- Section 7 : Résumé -->
+        <section id="section7" class="section hidden py-16">
+            <div class="text-center fade-in">
+                <h2 class="text-4xl font-bold mb-8">🎉 Félicitations !</h2>
+                <div class="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+                    <h3 class="text-2xl font-semibold mb-4">📚 Résumé du cours</h3>
+                    <div class="text-left space-y-4">
+                        <div class="p-4 bg-blue-50 rounded">
+                            <h4 class="font-semibold text-blue-800">🌳 Arbres Binaires</h4>
+                            <p class="text-sm">Structure récursive avec nœuds, feuilles, sous-arbres</p>
+                        </div>
+                        <div class="p-4 bg-green-50 rounded">
+                            <h4 class="font-semibold text-green-800">📏 Hauteur & Taille</h4>
+                            <p class="text-sm">log₂(N) ≤ h ≤ N</p>
+                        </div>
+                        <div class="p-4 bg-purple-50 rounded">
+                            <h4 class="font-semibold text-purple-800">🔄 Parcours</h4>
+                            <p class="text-sm">Infixe, préfixe, suffixe, largeur</p>
+                        </div>
+                        <div class="p-4 bg-yellow-50 rounded">
+                            <h4 class="font-semibold text-yellow-800">🔍 ABR</h4>
+                            <p class="text-sm">Propriété d'ordre, complexité O(log N) si équilibré</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-lg text-gray-700">
+                        💪 Vous êtes maintenant prêt à maîtriser les arbres binaires en NSI !
+                    </p>
+                </div>
+                <button onclick="window.scrollTo(0,0)" class="mt-8 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full font-semibold hover:scale-105 transition">
+                    Revenir au début ↩️
+                </button>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-8 mt-16">
+        <p>© 2024 Cours NSI Terminale - Arbres Binaires</p>
+        <p class="text-sm mt-2">Créé avec ❤️ pour les élèves de NSI</p>
+    </footer>
+    
+    <script>
+        // ==================== LOGIQUE DE NAVIGATION ====================
+        
+        let currentSection = 0;
+        const totalSections = 7;
+        
+        function showSection(index) {
+            // Cacher toutes les sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Afficher la section demandée
+            document.getElementById(`section${index}`).classList.remove('hidden');
+            
+            // Animer les éléments fade-in
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach(el => {
+                    el.classList.add('visible');
+                });
+            }, 100);
+            
+            // Mettre à jour la barre de progression
+            updateProgressBar();
+            
+            currentSection = index;
+        }
+        
+        function navigateSection(direction) {
+            if (direction === 'next' && currentSection < totalSections - 1) {
+                showSection(currentSection + 1);
+            } else if (direction === 'prev' && currentSection > 0) {
+                showSection(currentSection - 1);
+            }
+        }
+        
+        function updateProgressBar() {
+            const progress = ((currentSection + 1) / totalSections) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+        
+        // Navigation par les liens du menu
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const sectionIndex = parseInt(targetId.replace('#section', ''));
+                showSection(sectionIndex);
+            });
+        });
+        
+        // ==================== LOGIQUE PÉDAGOGIQUE ====================
+        
+        // Données pour les exercices
+        const exempleArbre = {
+            valeur: 'A',
+            gauche: {
+                valeur: 'B',
+                gauche: { valeur: 'D', gauche: null, droit: null },
+                droit: { valeur: 'E', gauche: null, droit: null }
+            },
+            droit: {
+                valeur: 'C',
+                gauche: { valeur: 'F', gauche: null, droit: null },
+                droit: { valeur: 'G', gauche: null, droit: null }
+            }
+        };
+        
+        // Fonction pour afficher les définitions
+        function showDefinition(type) {
+            const box = document.getElementById('definitionBox');
+            const definitions = {
+                racine: "🌱 La <strong>racine</strong> est le nœud unique par lequel on accède à l'arbre. C'est le point de départ !",
+                feuille: "🍃 Une <strong>feuille</strong> est un nœud qui n'a pas de fils (sous-arbres gauche et droit sont nil).",
+                nil: "0️⃣ <strong>nil</strong> vient du latin 'nihil' (rien). C'est l'arbre vide."
+            };
+            box.innerHTML = definitions[type];
+            box.classList.remove('hidden');
+        }
+        
+        // Visualisation d'arbre
+        function drawTree(containerId, tree) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '<p class="text-gray-500">Visualisation en cours de développement...</p>';
+            // En production, on utiliserait une librairie comme D3.js ou on créerait des divs positionnés
+        }
+        
+        // Animation du code
+        function animateCode() {
+            const code = document.querySelector('pre code');
+            code.style.animation = 'pulse 1s';
+            setTimeout(() => code.style.animation = '', 1000);
+        }
+        
+        // Test des fonctions hauteur/taille
+        function testHauteur() {
+            const feedback = document.getElementById('exerciseFeedback');
+            const code = document.getElementById('hauteurCode').value;
+            
+            // Simulation simple (en vrai, on exécuterait le code)
+            if (code.includes('max(hauteur(racine.gauche), hauteur(racine.droit))')) {
+                feedback.textContent = '✅ Bravo ! La fonction hauteur est correcte.';
+                feedback.className = 'mt-4 p-4 rounded correct';
+            } else {
+                feedback.textContent = '❌ Réessayez. Pensez à la récursivité et à max().';
+                feedback.className = 'mt-4 p-4 rounded incorrect';
+            }
+            feedback.classList.remove('hidden');
+        }
+        
+        function testTaille() {
+            const feedback = document.getElementById('exerciseFeedback');
+            const code = document.getElementById('tailleCode').value;
+            
+            if (code.includes('1 + taille(racine.gauche) + taille(racine.droit)')) {
+                feedback.textContent = '✅ Excellent ! La fonction taille est correcte.';
+                feedback.className = 'mt-4 p-4 rounded correct';
+            } else {
+                feedback.textContent = '❌ Réessayez. N\'oubliez pas de compter le nœud actuel.';
+                feedback.className = 'mt-4 p-4 rounded incorrect';
+            }
+            feedback.classList.remove('hidden');
+        }
+        
+        // Vérification du parcours
+        function checkParcours() {
+            const input = document.getElementById('parcoursInput').value.trim();
+            const feedback = document.getElementById('parcoursFeedback');
+            const expected = 'D B E A F C'; // Pour l'arbre exemple
+            
+            if (input.toUpperCase() === expected.toUpperCase()) {
+                feedback.textContent = '✅ Parfait ! L\'ordre infixe est correct.';
+                feedback.className = 'p-3 bg-green-100 text-green-800 rounded';
+            } else {
+                feedback.textContent = `❌ Incorrect. L'ordre est : ${expected}`;
+                feedback.className = 'p-3 bg-red-100 text-red-800 rounded';
+            }
+            feedback.classList.remove('hidden');
+        }
+        
+        // Simulation de parcours
+        function simulerParcours(type) {
+            const result = document.getElementById('simulationResult');
+            const parcours = {
+                infixe: 'D → B → E → A → F → C',
+                prefixe: 'A → B → D → E → C → F',
+                suffixe: 'D → E → B → F → C → A'
+            };
+            result.innerHTML = `<strong>${type.toUpperCase()} :</strong> ${parcours[type]}`;
+            result.className = 'p-4 bg-gray-100 rounded min-h-[100px] flex items-center justify-center text-lg font-mono animate-pulse';
+        }
+        
+        // Opérations ABR
+        function showABROperation(op) {
+            alert(`Détails de l'opération "${op}" en développement !`);
+        }
+        
+        // QCM
+        function checkQCM(name, correctValue) {
+            const selected = document.querySelector(`input[name="${name}"]:checked`);
+            const feedback = document.getElementById(`${name}-feedback`);
+            
+            if (!selected) {
+                alert('Veuillez sélectionner une réponse !');
+                return;
+            }
+            
+            if (selected.value === correctValue) {
+                feedback.textContent = '✅ Correct ! Les valeurs du sous-arbre gauche sont bien inférieures à la racine.';
+                feedback.className = 'mt-2 p-3 bg-green-100 text-green-800 rounded';
+            } else {
+                feedback.textContent = '❌ Incorrect. Revoyez les propriétés des ABR.';
+                feedback.className = 'mt-2 p-3 bg-red-100 text-red-800 rounded';
+            }
+            feedback.classList.remove('hidden');
+        }
+        
+        // Test fonction appartient
+        function testAppartient() {
+            const feedback = document.getElementById('appartientFeedback');
+            const code = document.getElementById('codeAppartient').value;
+            
+            if (code.includes('appartient(racine.gauche, v)') && code.includes('appartient(racine.droit, v)')) {
+                feedback.textContent = '✅ Super ! La recherche récursive est correcte.';
+                feedback.className = 'mt-2 p-3 bg-green-100 text-green-800 rounded';
+            } else {
+                feedback.textContent = '❌ Réessayez. Pensez à la propriété d\'ordre des ABR.';
+                feedback.className = 'mt-2 p-3 bg-red-100 text-red-800 rounded';
+            }
+            feedback.classList.remove('hidden');
+        }
+        
+        // Vrai/Faux
+        function checkVF(button, isCorrect) {
+            if (isCorrect) {
+                button.parentElement.innerHTML = '<span class="text-green-600 font-semibold">✅ VRAI - Le parcours infixe d\'un ABR est toujours trié !</span>';
+            } else {
+                button.parentElement.innerHTML = '<span class="text-red-600 font-semibold">❌ FAUX - Ce n\'est pas la bonne réponse.</span>';
+            }
+        }
+        
+        // ==================== QUIZ FINAL ====================
+        
+        const quizQuestions = [
+            {
+                question: "Qu'est-ce qu'un nœud feuille ?",
+                options: ["Un nœud avec deux fils", "Un nœud sans fils", "Le nœud racine", "Un nœud intermédiaire"],
+                correct: 1
+            },
+            {
+                question: "Quelle est la complexité de la recherche dans un ABR équilibré ?",
+                options: ["O(N)", "O(log N)", "O(1)", "O(N²)"],
+                correct: 1
+            },
+            {
+                question: "Dans un parcours infixe, dans quel ordre visite-t-on les nœuds ?",
+                options: ["Racine → Gauche → Droite", "Gauche → Racine → Droite", "Gauche → Droite → Racine", "Droite → Racine → Gauche"],
+                correct: 1
+            },
+            {
+                question: "Que vaut log₂(8) ?",
+                options: ["2", "3", "4", "8"],
+                correct: 1
+            },
+            {
+                question: "Un arbre parfait de hauteur 3 contient combien de nœuds maximum ?",
+                options: ["3", "6", "7", "8"],
+                correct: 2
+            }
+        ];
+        
+        let currentQuiz = 0;
+        let quizScore = 0;
+        
+        function startQuiz() {
+            currentQuiz = 0;
+            quizScore = 0;
+            document.getElementById('quizResult').classList.add('hidden');
+            showQuizQuestion();
+        }
+        
+        function showQuizQuestion() {
+            const container = document.getElementById('quizContainer');
+            const question = quizQuestions[currentQuiz];
+            
+            container.innerHTML = `
+                <div class="mb-4">
+                    <span class="text-sm text-gray-500">Question ${currentQuiz + 1} / ${quizQuestions.length}</span>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                        <div class="bg-blue-500 h-2 rounded-full transition-all" style="width: ${((currentQuiz + 1) / quizQuestions.length) * 100}%"></div>
+                    </div>
+                </div>
+                <h3 class="text-xl font-semibold mb-4">${question.question}</h3>
+                <div class="space-y-2">
+                    ${question.options.map((opt, i) => `
+                        <div class="quiz-option p-3 border rounded" onclick="selectQuizOption(this, ${i})">
+                            ${opt}
+                        </div>
+                    `).join('')}
+                </div>
+                <button id="quizNextBtn" onclick="nextQuizQuestion()" class="mt-4 px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition opacity-50 cursor-not-allowed" disabled>
+                    ${currentQuiz === quizQuestions.length - 1 ? 'Terminer le quiz' : 'Question suivante'}
+                </button>
+            `;
+        }
+        
+        function selectQuizOption(element, index) {
+            document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            element.dataset.selected = index;
+            
+            const btn = document.getElementById('quizNextBtn');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+        
+        function nextQuizQuestion() {
+            const selected = document.querySelector('.quiz-option.selected');
+            if (!selected) return;
+            
+            const answer = parseInt(selected.dataset.selected);
+            if (answer === quizQuestions[currentQuiz].correct) {
+                quizScore++;
+            }
+            
+            currentQuiz++;
+            if (currentQuiz < quizQuestions.length) {
+                showQuizQuestion();
+            } else {
+                showQuizResult();
+            }
+        }
+        
+        function showQuizResult() {
+            document.getElementById('quizContainer').classList.add('hidden');
+            document.getElementById('quizResult').classList.remove('hidden');
+            
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const scoreMessage = document.getElementById('scoreMessage');
+            const percentage = (quizScore / quizQuestions.length) * 100;
+            
+            scoreDisplay.textContent = `${quizScore}/${quizQuestions.length}`;
+            scoreDisplay.className = 'text-5xl font-bold mb-4';
+            
+            if (percentage >= 80) {
+                scoreMessage.textContent = '🏆 Excellent ! Vous maîtrisez parfaitement le sujet !';
+                scoreDisplay.className += ' text-green-500';
+            } else if (percentage >= 60) {
+                scoreMessage.textContent = '👍 Bien ! Quelques révisions et ce sera parfait !';
+                scoreDisplay.className += ' text-yellow-500';
+            } else {
+                scoreMessage.textContent = '💪 Continuez à travailler ! Relisez le cours avec attention.';
+                scoreDisplay.className += ' text-red-500';
+            }
+        }
+        
+        function restartQuiz() {
+            document.getElementById('quizContainer').classList.remove('hidden');
+            startQuiz();
+        }
+        
+        // ==================== INITIALISATION ====================
+        
+        // Observer pour les animations au scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialiser la première section
+            showSection(0);
+            
+            // Observer les éléments fade-in
+            document.querySelectorAll('.fade-in').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Dessiner les arbres
+            setTimeout(() => drawTree('treeVisualization', exempleArbre), 500);
+            setTimeout(() => drawTree('parcoursTree', exempleArbre), 500);
+            
+            // Démarrer le quiz au chargement de la section
+            const quizSection = document.getElementById('section6');
+            const quizObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    startQuiz();
+                }
+            });
+            quizObserver.observe(quizSection);
+        });
+        
+        // Animation de la barre de progression au scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+    </script>
+</body>
+</html>
